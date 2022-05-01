@@ -1,10 +1,9 @@
-import hashlib
+
 import json
 import random
 import string
-import sentry_sdk
-import traceback
-from marshmallow import pre_load, fields, post_load
+
+
 
 from flask import request
 from datetime import datetime, date, timedelta
@@ -29,7 +28,6 @@ def load_json(string: str):
     try:
         return json.loads(string, object_hook=json_decode_hook)
     except:
-        traceback.print_exc()
-        sentry_sdk.capture_exception()
+        pass
     return {}
 

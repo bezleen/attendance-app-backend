@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  heluhelu-id-api:
+  bezleen-id-api:
     container_name: bezleen-api
     build: .
     restart: on-failure
@@ -13,5 +13,5 @@ services:
       - PYTHONUNBUFFERED=true
     env_file:
       - .env
-    command: python manage.py run
+    command: python3 manage.py run
 
