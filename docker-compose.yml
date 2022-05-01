@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  heluhelu-id-api:
+    container_name: bezleen-api
+    build: .
+    restart: on-failure
+    volumes:
+      - ./:/webapps
+    ports:
+      - 5000:5000
+    environment:
+      - PYTHONUNBUFFERED=true
+    env_file:
+      - .env
+    command: python manage.py run
+
