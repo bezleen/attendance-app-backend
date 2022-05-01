@@ -1,4 +1,4 @@
-FROM python:3.8-alpine
+FROM whoiskp/python:lus-base
 
 COPY requirements.txt .
 RUN pip --no-cache-dir install -r requirements.txt
