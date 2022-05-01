@@ -22,7 +22,7 @@ def get_images():
     page = py_.to_integer(py_.get(args, 'page', 1))
     page_size = py_.to_integer(py_.get(args, 'page_size', Consts.PAGE_SIZE_MAX))
     try:
-        return_data = Controller.Student.list_students(page,page_size)
+        return_data = Controller.Images.list_images(page,page_size)
     except ValueError as e:
         return {
             "status": HTTPStatus.BAD_REQUEST,
