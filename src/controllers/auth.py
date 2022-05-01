@@ -27,19 +27,13 @@ class Auth(object):
 
     @classmethod
     def update_info(cls, user_id: str,  update_data: dict):
-        user_info = Repo.mUser.get_item(oid=user_id)
-        if 'show_skin' in update_data:
-            user_skins = py_.get(user_info, 'skins')
-            if not update_data['show_skin'] in user_skins:
-                raise ValueError('user_not_owned_skin')
+        
 
         user = Repo.mUser.update_by_filter({
             '_id': bson.ObjectId(user_id)
         }, update_data)
-        return {
-            **user_info,
-            **update_data
-        }
+        user_info = Repo.mUser.get_item(oid=user_id)
+        return user_info
 
 
     @classmethod
