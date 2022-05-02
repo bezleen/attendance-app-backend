@@ -13,6 +13,16 @@ class Student(object):
         # insert student
         obj = SchemaStudent.Item().load(payload)
         py_.set_(obj, "created_by", user_id)
+        #check index
+        info=Repo.mStudent.get_item_with(
+            {
+                "student_id": py_.get(obj, "student_id"), 
+                "created_by": py_.get(obj, "created_by")
+            }
+        )
+        if info:
+            raise ValueError("Student is already taken!")
+
         student = Repo.mStudent.insert(obj)
         # append into class
         info=Repo.mStudent.get_item_with(
@@ -37,7 +47,7 @@ class Student(object):
         }
         obj_images = SchemaImages.Item().load(item_images)
         image_id = Repo.mImages.insert(obj_images)
-        return 
+        return str(id)
 
     @classmethod
     def list_students(cls, user_id, page, page_size):

@@ -38,7 +38,7 @@ def add_student():
         }
     return {
         "status": HTTPStatus.OK,
-        "data": {},
+        "data": {"id":student_id},
         "msg": Consts.MESSAGE_SUCCESS
     }
 

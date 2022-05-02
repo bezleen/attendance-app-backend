@@ -18,7 +18,14 @@ class Classroom(object):
     def add_classroom(cls, user_id, payload):
         obj = SchemaClassroom.Item().load(payload)
         py_.set_(obj, "created_by", user_id)
-        print(obj)
+        info=Repo.mClassroom.get_item_with(
+            {
+                "name": py_.get(obj, "name"), 
+                "created_by": py_.get(obj, "created_by")
+            }
+        )
+        if info:
+            raise ValueError("Classroom is already taken!")
         id = Repo.mClassroom.insert(obj)
         return id
 
