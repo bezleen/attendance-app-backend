@@ -65,9 +65,27 @@ def get_student():
 
 @bp.route('/<id>', methods=['GET'])
 @jwt_required()
-def get_one_student(id):
+def get_one_student_by_oid(id):
     try:
         return_data = Controller.Student.one_student(id)
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
+    return {
+        "status": HTTPStatus.OK,
+        "data": return_data,
+        "msg": Consts.MESSAGE_SUCCESS
+    }
+
+@bp.route('id/<id>', methods=['GET'])
+@jwt_required()
+def get_one_student_by_id(id):
+    user_id = py_.get(current_user, '_id')
+    try:
+        return_data = Controller.Student.one_student_id(id,user_id)
     except ValueError as e:
         return {
             "status": HTTPStatus.BAD_REQUEST,

@@ -61,3 +61,13 @@ class Student(object):
         item = Repo.mStudent.get_item(id)
         obj = SchemaStudent.ItemResponse().dump(item)
         return obj
+    @classmethod
+    def one_student_id(cls, id,user_id):
+        item = Repo.mStudent.get_item_with(
+            {
+                "student_id":id,
+                "created_by":user_id
+            }
+            )
+        obj = SchemaStudent.ItemResponse().dump(item)
+        return obj
