@@ -1,6 +1,7 @@
 from flask import Flask
 from datetime import datetime
 from .config import DefaultConfig
+import src.constants as Consts
 from .extensions import (
     mdb, jwt
 )
@@ -17,7 +18,7 @@ def create_app(app_name=None):
     configure_app(app)
     configure_extensions(app)
     configure_blueprints(app)
-
+    print("upload folder : "+str(Consts.UPLOAD_FOLDER))
     return app
 
 
@@ -35,7 +36,7 @@ def configure_extensions(app):
 
     @jwt.user_lookup_loader
     def load_user(_jwt_header, jwt_data):
-        # TODO: cache
+
         def get_user(user):
             if user:
                 user['_id'] = str(user['_id'])
@@ -50,7 +51,6 @@ def configure_extensions(app):
                 if iat_datetime < date:
                     return 0
             return 1
-
 
         from src.models.repo import mUser
         identity = jwt_data["sub"]

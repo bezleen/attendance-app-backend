@@ -34,3 +34,29 @@ def get_images():
         "data": return_data,
         "msg": Consts.MESSAGE_SUCCESS
     }
+
+@bp.route('', methods=['POST'])
+@jwt_required()
+def upload_file():
+    args = request.args
+    student_oid = py_.get(args, 'student_oid', None)
+    try:
+        if 'file' not in request.files:
+            return{
+                "status": HTTPStatus.BAD_REQUEST,
+                "data": {},
+                "msg": "No file part in the request"
+            }
+        file = request.files['file']
+        return_data = Controller.Images.exec_upload(file,student_oid)
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
+    return {
+        "status": HTTPStatus.OK,
+        "data": {},
+        "msg": Consts.MESSAGE_SUCCESS
+    }

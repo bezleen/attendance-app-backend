@@ -2,8 +2,7 @@
 import json
 import random
 import string
-
-
+import src.constants as Consts
 
 from flask import request
 from datetime import datetime, date, timedelta
@@ -30,4 +29,8 @@ def load_json(string: str):
     except:
         pass
     return {}
-
+def check_allowed_file(filename):
+    tail = filename.split('.')[-1].lower() 
+    if '.' in filename and tail in Consts.ALLOWED_FILE:
+        return True
+    return False

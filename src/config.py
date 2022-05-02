@@ -3,6 +3,7 @@
 import os
 import json
 import datetime
+import src.constants as Consts
 from dotenv import load_dotenv
 from src.functions import load_json
 
@@ -29,6 +30,7 @@ class DefaultConfig(BaseConfig):
     BABEL_DEFAULT_LOCALE = 'en'
 
     MONGO_URI = os.getenv('MONGO_URI')
+    UPLOAD_FOLDER = Consts.UPLOAD_FOLDER
 
 
 
