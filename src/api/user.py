@@ -141,3 +141,27 @@ def change_password():
     }
 
 
+@bp.route('/avatar', methods=['PUT'])
+@jwt_required()
+def upload_file():
+    user_id = py_.get(current_user, '_id')
+    try:
+        if 'file' not in request.files:
+            return{
+                "status": HTTPStatus.BAD_REQUEST,
+                "data": {},
+                "msg": "No file part in the request"
+            }
+        file = request.files['file']
+        return_data = Controller.Auth.exec_upload(file,user_id)
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
+    return {
+        "status": HTTPStatus.OK,
+        "data": {},
+        "msg": Consts.MESSAGE_SUCCESS
+    }

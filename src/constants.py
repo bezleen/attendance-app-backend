@@ -8,7 +8,8 @@ STATUS_ACTIVE = 'active'
 STATUS_INACTIVE = 'inactive'
 
 MESSAGE_SUCCESS='success'
-PREFIX_CDN=''
+PREFIX_CDN='http://14.225.254.88:5000'
+# PREFIX_CDN='http://localhost:5000'
 
 STATE_ALL='all'
 STATE_ABSENT='absent'
