@@ -19,8 +19,9 @@ bp = Blueprint('sheet', __name__, url_prefix='/api/sheet')
 @jwt_required()
 def attendance():
     payload = request.get_json()
+    user_id= py_.get(current_user, '_id')
     try:
-        Controller.Sheet.roll_call(payload)
+        Controller.Sheet.roll_call(payload,user_id)
     except ValidationError as e:
         return {
             "status": HTTPStatus.BAD_REQUEST,
