@@ -44,7 +44,7 @@ class ItemLogin(ma.Schema):
         ordered = True
 
     email = ma.fields.Str()
-    password = ma.fields.Str(attribute="_password")
+    password = ma.fields.Str(attribute="password")
 
 class ItemResponse(ma.Schema):
     class Meta:
@@ -77,3 +77,26 @@ class ItemAuthPassword(ma.Schema):
     email = ma.fields.Email()
     current_password = ma.fields.Str()
     new_password = ma.fields.Str()
+
+class ItemSendOTP(ma.Schema):
+    class Meta:
+        ordered = True
+        unknown = ma.EXCLUDE
+
+    email = ma.fields.Email()
+class ItemCheckOTP(ma.Schema):
+    class Meta:
+        ordered = True
+        unknown = ma.EXCLUDE
+
+    email = ma.fields.Email()
+    otp= ma.fields.Str()
+
+class ItemResetPassword(ma.Schema):
+    class Meta:
+        ordered = True
+        unknown = ma.EXCLUDE
+
+    email = ma.fields.Email()
+    otp= ma.fields.Str()
+    new_password= ma.fields.Str()

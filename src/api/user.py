@@ -34,13 +34,43 @@ def user_info():
     }
 
 
+# @bp.route('/auth', methods=['POST'])
+# def auth():
+#     payload = request.get_json()
+#     try:
+#         item = SchemaUser.ItemLogin().load(payload)
+#         at, rt = Controller.Auth.exec_login(
+#             item.get('email'), item.get('_password'))
+
+#         if not at:
+#             return {
+#                 "status": HTTPStatus.UNAUTHORIZED,
+#                 "data": {},
+#                 "msg": "User not register or wrong password"
+#             }
+#     except ValidationError as e:
+#         return {
+#             "status": HTTPStatus.BAD_REQUEST,
+#             "data": {},
+#             "msg": str(e)
+#         }
+
+#     return {
+#         "status": HTTPStatus.OK,
+#         "data": {
+#             "access_token": at,
+#             "refresh_token": rt
+#         },
+#         "msg": Consts.MESSAGE_SUCCESS
+#     }
 @bp.route('/auth', methods=['POST'])
 def auth():
     payload = request.get_json()
+    user = None
     try:
         item = SchemaUser.ItemLogin().load(payload)
-        at, rt = Controller.Auth.exec_login(
-            item.get('email'), item.get('_password'))
+        at, rt = Controller.Auth.exec_login_firebase(
+            item.get('email'), item.get('password'))
 
         if not at:
             return {
@@ -54,7 +84,12 @@ def auth():
             "data": {},
             "msg": str(e)
         }
-
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
     return {
         "status": HTTPStatus.OK,
         "data": {
@@ -64,14 +99,41 @@ def auth():
         "msg": Consts.MESSAGE_SUCCESS
     }
 
+# @bp.route('/register', methods=['POST'])
+# def register():
+#     payload = request.get_json()
+#     try:
+#         item = SchemaUser.ItemRegister().load(payload)
+#         Controller.Auth.exec_register(item.get('email'), item.get(
+#             '_password'), item.get('name'), item.get('avatar'),item.get('phone'))
+#     except ValidationError as e:
+#         return {
+#             "status": HTTPStatus.BAD_REQUEST,
+#             "data": {},
+#             "msg": str(e)
+#         }
+#     except DuplicateKeyError as e:
+#         return {
+#             "status": HTTPStatus.NOT_ACCEPTABLE,
+#             "data": {},
+#             "msg": "Email or username already taken!"
+#         }
+
+#     return {
+#         "status": HTTPStatus.OK,
+#         "data": {},
+#         "msg": Consts.MESSAGE_SUCCESS
+#     }
 
 @bp.route('/register', methods=['POST'])
 def register():
     payload = request.get_json()
     try:
         item = SchemaUser.ItemRegister().load(payload)
-        Controller.Auth.exec_register(item.get('email'), item.get(
-            '_password'), item.get('name'), item.get('avatar'),item.get('phone'))
+        # if py_.get(item, 'avatar') == '':
+        #     py_.set_(item, 'avatar', Consts.DEFAULT_AVATAR)
+        Controller.Auth.exec_register_firebase(item.get('email'), item.get(
+            '_password'), item.get('name'))
     except ValidationError as e:
         return {
             "status": HTTPStatus.BAD_REQUEST,
@@ -82,14 +144,20 @@ def register():
         return {
             "status": HTTPStatus.NOT_ACCEPTABLE,
             "data": {},
-            "msg": "Email or username already taken!"
+            "msg": "Username already taken!"
         }
-
+    except:
+        return {
+            "status": HTTPStatus.NOT_ACCEPTABLE,
+            "data": {},
+            "msg": "Email already taken!"
+        }
     return {
         "status": HTTPStatus.OK,
         "data": {},
         "msg": Consts.MESSAGE_SUCCESS
     }
+
 
 
 @bp.route('', methods=['PUT'])
@@ -154,6 +222,70 @@ def upload_file():
             }
         file = request.files['file']
         return_data = Controller.Auth.exec_upload(file,user_id)
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
+    return {
+        "status": HTTPStatus.OK,
+        "data": {},
+        "msg": Consts.MESSAGE_SUCCESS
+    }
+
+
+
+
+@bp.route('/send_otp', methods=['POST'])
+def otp_send():
+    payload = request.get_json()
+    try:
+        email_obj = SchemaUser.ItemSendOTP().load(payload)
+        email = py_.get(email_obj, 'email')
+        Controller.Auth.send_otp(email)
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
+    return {
+        "status": HTTPStatus.OK,
+        "data": {},
+        "msg": Consts.MESSAGE_SUCCESS
+    }
+
+
+@bp.route('/check_otp', methods=['POST'])
+def otp_check():
+    payload = request.get_json()
+    try:
+        obj = SchemaUser.ItemCheckOTP().load(payload)
+        email = py_.get(obj, 'email')
+        otp= py_.get(obj, 'otp')
+        result=Controller.Auth.check_otp(email,otp)
+    except ValueError as e:
+        return {
+            "status": HTTPStatus.BAD_REQUEST,
+            "data": {},
+            "msg": str(e)
+        }
+    return {
+        "status": HTTPStatus.OK,
+        "data": {"correct":result},
+        "msg": Consts.MESSAGE_SUCCESS
+    }
+
+@bp.route('/reset_password', methods=['POST'])
+def password_reset():
+    payload = request.get_json()
+    try:
+        obj = SchemaUser.ItemResetPassword().load(payload)
+        email = py_.get(obj, 'email')
+        otp= py_.get(obj, 'otp')
+        new_password=py_.get(obj, 'new_password')
+        Controller.Auth.reset_password(email,otp,new_password)
     except ValueError as e:
         return {
             "status": HTTPStatus.BAD_REQUEST,

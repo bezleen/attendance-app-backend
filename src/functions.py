@@ -6,6 +6,7 @@ import src.constants as Consts
 
 from flask import request
 from datetime import datetime, date, timedelta
+import smtplib
 
 
 def json_decode_hook(obj):
@@ -34,3 +35,24 @@ def check_allowed_file(filename):
     if '.' in filename and tail in Consts.ALLOWED_FILE:
         return True
     return False
+def random_otp(length):
+    otp=''
+    for i in range(7):
+        num = random.randint(0,9)
+        otp=otp+str(num)
+    return otp
+def send_otp_mail(email,otp):
+    try:
+        sender_email = "19520532@gm.uit.edu.vn"
+        rec_email = email
+        password = Consts.SMTP_PASSWORD
+        message = 'Subject: "OTP Confirmation"\n\nThis is your OTP: {}'.format(otp)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, password)
+        print("Login smtp success")
+        server.sendmail(sender_email, rec_email, message)
+        print("Email has been sent to ", rec_email)
+        return True
+    except:
+        return False

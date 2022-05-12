@@ -6,7 +6,7 @@ from .base import BaseDAO
 import src.schemas.user as SchemaUser
 import bson
 from datetime import datetime
-
+import src.constants as Consts
 '''
 * Index:
     1. ```db.getCollection('user').createIndex( { "email": 1 }, { unique: true } )```
@@ -16,23 +16,32 @@ from datetime import datetime
 
 class UserDAO(BaseDAO):
 
-    def exec_register(self, email, password, name, avatar,phone):
+    # def exec_register(self, email, password, name, avatar,phone):
+    #     item = {}
+    #     # print(item)
+    #     item['email'] = email.lower()
+    #     item['avatar'] = avatar
+    #     item['name'] = name
+    #     item['phone']=phone
+    #     item['_password'] = password
+    #     # validate
+    #     item['_password_hash_algorithm'] = 'sha256'
+    #     item['_password_salt'] = random_string()
+    #     item['_password'] = hashlib.pbkdf2_hmac(item['_password_hash_algorithm'], item['_password'].encode('utf-8'),
+    #                                             item['_password_salt'].encode("utf-8"), 100000).hex()
+    #     item = SchemaUser.Item().load(item)
+    #     print(item)
+    #     self.insert(item)
+    #     return item
+    def exec_register_firebase(self, email, name):
         item = {}
         # print(item)
         item['email'] = email.lower()
-        item['avatar'] = avatar
+        item['avatar'] = Consts.DEFAULT_AVATAR
         item['name'] = name
-        item['phone']=phone
-        item['_password'] = password
-        # validate
-        item['_password_hash_algorithm'] = 'sha256'
-        item['_password_salt'] = random_string()
-        item['_password'] = hashlib.pbkdf2_hmac(item['_password_hash_algorithm'], item['_password'].encode('utf-8'),
-                                                item['_password_salt'].encode("utf-8"), 100000).hex()
         item = SchemaUser.Item().load(item)
-        print(item)
-        self.insert(item)
-        return item
+        obj = self.insert(item)
+        return obj
 
     def get_by_email_password(self, email, password):
         user = self.get_item_with({"email": email})
