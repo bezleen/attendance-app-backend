@@ -3,13 +3,51 @@ import random as rd
 import pydash as py_
 from flask_jwt_extended import create_access_token, create_refresh_token, decode_token
 import src.models.repo as Repo
-from src.extensions import  redis_cluster, auth
-from src.functions import check_allowed_file,random_otp,send_otp_mail
+from src.extensions import  auth
+from src.functions import check_allowed_file, random_otp, send_otp_mail
 from werkzeug.utils import secure_filename
 import src.constants as Consts
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import src.firebase_admin_func as fa
+
+
+def setex(key, otp):
+    check_exist = Repo.mOtp.get_item_with(
+        {
+            "key": key
+        }
+    )
+    if not check_exist:
+        Repo.mOtp.insert(
+            {
+                "key": key,
+                "otp": otp,
+                "exp": datetime.now()+timedelta(minutes=2)
+            }
+        )
+    else:
+        Repo.mOtp.update_raw(
+            {
+                "key": key
+            },
+            {
+                "$set": {
+                    "otp": otp,
+                    "exp": datetime.now()+timedelta(minutes=2)
+                }
+            }
+
+        )
+
+def get(key):
+    otp = Repo.mOtp.get_item_with(
+        {
+            "key": key,
+            "exp":{"$gt":datetime.now()}
+        }
+    )
+    return py_.get(otp,"otp")
 class Auth(object):
 
     # @classmethod
@@ -17,11 +55,10 @@ class Auth(object):
     #     Repo.mUser.exec_register(email, password, name, avatar, phone)
     #     return True
 
-
     @classmethod
     def exec_register_firebase(cls, email, password, name):
         # print("exec_register: ", email, password, name, avatar)
-        
+
         user = auth.create_user_with_email_and_password(email, password)
         Repo.mUser.exec_register_firebase(email, name)
         auth.send_email_verification(user['idToken'])
@@ -39,8 +76,6 @@ class Auth(object):
         )
         return True
 
-
-
     # @classmethod
     # def exec_login(cls, email, password):
     #     user = Repo.mUser.get_by_email_password(email, password)
@@ -51,8 +86,6 @@ class Auth(object):
     #     rt = create_refresh_token(identity=str(user['_id']))
     #     # TODO: save token log
     #     return at, rt
-
-
 
     @classmethod
     def exec_login_firebase(cls, email, password):
@@ -84,8 +117,6 @@ class Auth(object):
             rt = create_refresh_token(identity=str(user_oid))
             # TODO: save token log
             return at, rt
-
-
 
     @classmethod
     def update_info(cls, user_id: str,  update_data: dict):
@@ -119,10 +150,10 @@ class Auth(object):
         # save path
         Repo.mUser.update_raw(
             {
-                "_id":bson.ObjectId(user_id)
+                "_id": bson.ObjectId(user_id)
             },
             {
-                "$set":{"avatar":"/static/uploads/"+true_filename}
+                "$set": {"avatar": "/static/uploads/"+true_filename}
             }
         )
         return
@@ -137,13 +168,18 @@ class Auth(object):
         otp = random_otp(Consts.LENGTH_OTP)
         # send mail
         # print(otp)
-        mail_status= send_otp_mail(email,otp)
+        mail_status = send_otp_mail(email, otp)
         if mail_status == False:
             raise ValueError("Email failed")
+        '''
         # setex otp->redis
         oid = str(py_.get(info, "_id"))
         key = Consts.KEY_OTP_REDIS+oid
         redis_cluster.setex(key, Consts.EXP_OTP, otp)
+        '''
+        oid = str(py_.get(info, "_id"))
+        key = Consts.KEY_OTP_REDIS+oid
+        setex(key,otp)
         return True
 
     @classmethod
@@ -155,7 +191,8 @@ class Auth(object):
         # get true otp
         oid = str(py_.get(info, "_id"))
         key = Consts.KEY_OTP_REDIS+oid
-        true_otp = redis_cluster.get(key)
+        # true_otp = redis_cluster.get(key)
+        true_otp=get(key)
         if not true_otp:
             raise ValueError("OTP already expired")
         try:
@@ -164,7 +201,8 @@ class Auth(object):
             raise ValueError("Wrong format OTP")
         if int_otp == int(true_otp):
             # 2 minutes to change password
-            redis_cluster.setex(key, Consts.EXP_OTP, true_otp)
+            # redis_cluster.setex(key, Consts.EXP_OTP, true_otp)
+            setex(key,otp)
             return True
         return False
 
@@ -177,7 +215,8 @@ class Auth(object):
         # get true otp
         oid = str(py_.get(info, "_id"))
         key = Consts.KEY_OTP_REDIS+oid
-        true_otp = redis_cluster.get(key)
+        # true_otp = redis_cluster.get(key)
+        true_otp=get(key)
         if not true_otp:
             raise ValueError("Time already expired")
         try:
@@ -189,14 +228,14 @@ class Auth(object):
             result = fa.change_password(uid, new_password)
             if result == False:
                 raise ValueError("Change password failed")
-            #add date_change_password
+            # add date_change_password
             now = datetime.now()
             Repo.mUser.update_raw(
                 {
-                    "user_uid":uid
+                    "user_uid": uid
                 },
                 {
-                    "$set":{"date_change_password":now}
+                    "$set": {"date_change_password": now}
                 }
             )
         return True

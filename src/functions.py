@@ -56,3 +56,4 @@ def send_otp_mail(email,otp):
         return True
     except:
         return False
+

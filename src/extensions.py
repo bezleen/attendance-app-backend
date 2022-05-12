@@ -8,12 +8,12 @@ auth=firebase.auth()
 
 mdb = PyMongo()
 
-print(Conf.REDIS_USERS_STARTUP_NODES)
-redis_cluster = RedisCluster(
-    startup_nodes=Conf.REDIS_USERS_STARTUP_NODES,
-    decode_responses=True
-)
+# print(Conf.REDIS_USERS_STARTUP_NODES)
+# redis_cluster = RedisCluster(
+#     startup_nodes=Conf.REDIS_USERS_STARTUP_NODES,
+#     decode_responses=True
+# )
 
-print('Init Redis Cluster: successfully')
+# print('Init Redis Cluster: successfully')
 jwt = JWTManager()
 
