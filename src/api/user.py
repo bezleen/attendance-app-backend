@@ -312,3 +312,12 @@ def refresh():
         },
         "msg": Consts.MESSAGE_SUCCESS
     }
+
+@bp.route("/ping", methods=['POST'])
+@jwt_required()
+def ping():
+    return{
+        "status": HTTPStatus.OK,
+        "data": {},
+        "msg": Consts.MESSAGE_SUCCESS
+    }
