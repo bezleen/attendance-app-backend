@@ -35,8 +35,8 @@ class DefaultConfig(BaseConfig):
 
 
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-    AT_TIME = int(os.getenv('AT_TIME', 8640000))
-    RF_TIME = int(os.getenv('RF_TIME', 3600))
+    AT_TIME = int(os.getenv('AT_TIME', 1440))
+    RF_TIME = int(os.getenv('RF_TIME', 43200))
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=AT_TIME)
     JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(minutes=RF_TIME)
 

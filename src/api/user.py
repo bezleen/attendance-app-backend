@@ -6,7 +6,7 @@ from flask import (
 from marshmallow import ValidationError
 import pydash as py_
 from pymongo.errors import DuplicateKeyError
-from flask_jwt_extended import jwt_required, current_user
+from flask_jwt_extended import jwt_required, current_user,get_jwt_identity
 
 
 import src.constants as Consts
@@ -163,5 +163,22 @@ def upload_file():
     return {
         "status": HTTPStatus.OK,
         "data": {},
+        "msg": Consts.MESSAGE_SUCCESS
+    }
+
+
+
+@bp.route("/refresh", methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    access_token, refresh_token = Controller.Auth.get_token(
+        identity)
+    return{
+        "status": HTTPStatus.OK,
+        "data": {
+            "access_token": access_token,
+            "refresh_token":refresh_token
+        },
         "msg": Consts.MESSAGE_SUCCESS
     }
