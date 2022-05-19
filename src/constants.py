@@ -33,7 +33,7 @@ FIREBASE_CONFIG ={
   "serviceAccount": SERVICE_ACCOUNT_KEY
 }
 SMTP_PASSWORD=os.getenv('SMTP_PASSWORD')
-DEFAULT_AVATAR=""
+DEFAULT_AVATAR="/static/uploads/avatar-62866571990132d8332ad17b.png"
 EXP_OTP=120
 KEY_OTP_REDIS="helu-helu:auth/user:forgot_password_OTP-"
 LENGTH_OTP=7
