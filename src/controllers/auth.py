@@ -157,6 +157,7 @@ class Auth(object):
             }
         )
         return
+<<<<<<< HEAD
 
     @classmethod
     def send_otp(cls, email):
@@ -239,3 +240,14 @@ class Auth(object):
                 }
             )
         return True
+=======
+    @classmethod
+    def get_token(cls, identity):
+
+        info = Repo.mUser.get_item(identity)
+        name = py_.get(info, 'name')
+        access_token = create_access_token(
+            identity=identity, fresh=True, additional_claims={'name': name})
+        refresh_token = create_refresh_token(identity=identity)
+        return access_token, refresh_token
+>>>>>>> hien
